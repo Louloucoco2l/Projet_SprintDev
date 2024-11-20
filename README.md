@@ -116,3 +116,12 @@ sprintdevchat
 │   ├── user_id (INT, FOREIGN KEY REFERENCES Users(user_id))
 │   ├── content (TEXT)
 │   ├── created_at (TIMESTAMP)
+
+
+
+
+
+on utilise du java pour conserver ouvert l affichae des modules au sein d un cours
+En effet pour eviter une double requete au rechargement de la page, on redirige vers la meme page avec $_SERVER['REQUEST_URI'].
+Cela permet d'éliminer les données POST et de recharger la page proprement.
+

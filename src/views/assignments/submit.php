@@ -42,19 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Submit Assignment</title>
+    <title>Envoyer un devoir</title>
     <link rel="stylesheet" type="text/css" href="../../../public/style.css">
 </head>
 <body>
-<h2>Submit Assignment</h2>
+<h2>Envoyer un devoir</h2>
 <form action="submit.php" method="post" enctype="multipart/form-data">
-    <label for="assignment_name">Assignment Name:</label>
+    <label for="assignment_name">Donner un nom au fichier:</label>
     <input type="text" id="assignment_name" name="assignment_name" required>
     <br>
-    <label for="assignment_file">Upload File:</label>
+    <label for="assignment_file">Choisir le fichier:</label>
     <input type="file" id="assignment_file" name="assignment_file" required>
     <br>
-    <button type="submit">Submit Assignment</button>
+    <button type="submit">Envoyer</button>
 </form>
 </body>
 </html>

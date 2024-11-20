@@ -6,70 +6,90 @@ require_once __DIR__ . '/../../../config/db.php';
 
 global $pdo;
 
-try{
-    //echo 'Request Method: ' . $_SERVER['REQUEST_METHOD'] . '<br>';
-    //echo 'Session Role: ' . (isset($_SESSION['role']) ? $_SESSION['role'] : 'Not set') . '<br>';
-    //echo 'Is Teacher or Admin: ' . (isset($_SESSION['role']) && ($_SESSION['role'] == 'teacher' || $_SESSION['role'] == 'admin') ? 'Yes' : 'No') . '<br>';
-
-
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['role']) && ($_SESSION['role'] == 'teacher' || $_SESSION['role'] == 'admin')) {
-        if (isset($_POST['add_course'])) {//bouton "ajouter le cours" apres avoir entre les infos du nouveau cours
-            // Récupère le titre du cours depuis le formulaire soumis
+try {
+    // Traitement des actions POST
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // Inscription à un cours
+        if (isset($_POST['enroll']) && isset($_SESSION['role']) && $_SESSION['role'] == 'student') {
+            $course_id = $_POST['course_id'];
+            $stmt = $pdo->prepare('INSERT INTO Enrollments (course_id, student_id, enrolled_at) VALUES (:course_id, :student_id, NOW())');
+            $stmt->execute(['course_id' => $course_id, 'student_id' => $_SESSION['user_id']]);
+        }
+        // Désinscription d'un cours
+        elseif (isset($_POST['unenroll']) && isset($_SESSION['role']) && $_SESSION['role'] == 'student') {
+            $course_id = $_POST['course_id'];
+            $stmt = $pdo->prepare('DELETE FROM Enrollments WHERE course_id = :course_id AND student_id = :student_id');
+            $stmt->execute(['course_id' => $course_id, 'student_id' => $_SESSION['user_id']]);
+        }
+        // Ajout d'un module
+        elseif (isset($_POST['add_module']) && isset($_SESSION['role']) && ($_SESSION['role'] == 'teacher' || $_SESSION['role'] == 'admin')) {
+            $course_id = $_POST['course_id'];
+            $module_title = $_POST['module_title'];
+            $module_description = $_POST['module_description'];
+            $teacher_id = $_SESSION['user_id'];
+            $stmt = $pdo->prepare('INSERT INTO Modules (course_id, title, description, teacher_id, created_at, updated_at) VALUES (:course_id, :title, :description, :teacher_id, NOW(), NOW())');
+            $stmt->execute(['course_id' => $course_id, 'title' => $module_title, 'description' => $module_description, 'teacher_id' => $teacher_id]);
+        }
+        // Ajout d'un cours
+        elseif (isset($_POST['add_course']) && isset($_SESSION['role']) && ($_SESSION['role'] == 'teacher' || $_SESSION['role'] == 'admin')) {
             $title = $_POST['title'];
-            // Récupère la description du cours depuis le formulaire soumis
             $description = $_POST['description'];
-            // Détermine l'ID de l'enseignant : si l'utilisateur est un admin, utilise l'ID de l'enseignant sélectionné dans le formulaire, sinon utilise l'ID de l'utilisateur connecté
             $teacher_id = $_SESSION['role'] == 'admin' ? $_POST['teacher_id'] : $_SESSION['user_id'];
-            // Prépare une requête pour insérer un nouveau cours dans la table `courses`
             $stmt = $pdo->prepare('INSERT INTO Courses (title, description, teacher_id, created_at, updated_at) VALUES (:title, :description, :teacher_id, NOW(), NOW())');
-            // Exécute la requête préparée avec les valeurs récupérées du formulaire
             $stmt->execute(['title' => $title, 'description' => $description, 'teacher_id' => $teacher_id]);
-
-
-            // Prépare une requête pour sélectionner le rôle de l'utilisateur connecté
-            $role_stmt = $pdo->prepare('SELECT role FROM Users WHERE user_id = :user_id');
-            // Exécute la requête préparée avec l'ID de l'utilisateur connecté
-            $role_stmt->execute(['user_id' => $_SESSION['user_id']]);
-            // Récupère le rôle de l'utilisateur connecté
-            $role = $role_stmt->fetchColumn();
-            //echo 'Nouveau cours ajouté dans la base de données.';
         }
     }
-}catch (PDOException $e){
+
+    // Récupération des données
+    $stmt = $pdo->query('SELECT Courses.*, Users.last_name FROM Courses JOIN Users ON Courses.teacher_id = Users.user_id');
+    $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (isset($_SESSION['role']) && $_SESSION['role'] == 'student') {
+        $stmt = $pdo->prepare('SELECT course_id FROM Enrollments WHERE student_id = :student_id');
+        $stmt->execute(['student_id' => $_SESSION['user_id']]);
+        $enrolled_courses = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    } else {
+        $enrolled_courses = [];
+    }
+
+    $teachers_stmt = $pdo->query('SELECT user_id, last_name FROM Users WHERE role = "teacher"');
+    $teachers = $teachers_stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
     echo 'Error: ' . $e->getMessage();
 }
-
-
-$stmt = $pdo->query('
-    SELECT Courses.*, Users.last_name FROM Courses JOIN Users ON Courses.teacher_id = Users.user_id
-');
-$courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$teachers_stmt = $pdo->query('SELECT user_id, last_name FROM Users WHERE role = "teacher"');
-$teachers = $teachers_stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Course List</title>
+    <title>Répertoire des cours</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function toggleModules(courseId) {
-            var modulesDiv = document.getElementById('modules-' + courseId);
-            if (modulesDiv.style.display === 'none') {
-                modulesDiv.style.display = 'block';
+            var modulesRow = document.getElementById('modules-' + courseId);
+            if (modulesRow.style.display === 'none') {
+                modulesRow.style.display = 'table-row';
             } else {
-                modulesDiv.style.display = 'none';
+                modulesRow.style.display = 'none';
             }
         }
     </script>
+    <style>
+        table {
+            width: 100%;
+            table-layout: fixed;
+        }
+        th, td {
+            width: 25%;
+        }
+    </style>
 </head>
 <body>
 <h2>Répertoire des cours</h2>
 <table>
     <tr>
-        <th>ID</th>
         <th>Titre</th>
         <th>Description</th>
         <th>Enseignant</th>
@@ -77,63 +97,71 @@ $teachers = $teachers_stmt->fetchAll(PDO::FETCH_ASSOC);
     </tr>
     <?php foreach ($courses as $course): ?>
         <tr>
-            <td><?= htmlspecialchars($course['course_id']) ?></td>
             <td><?= htmlspecialchars($course['title']) ?></td>
             <td><?= htmlspecialchars($course['description']) ?></td>
             <td><?= htmlspecialchars($course['last_name']) ?></td>
             <td>
-                <button onclick="toggleModules(<?= $course['course_id'] ?>)">Voir les Modules</button>
-            </td>
-        </tr>
-        <tr id="modules-<?= $course['course_id'] ?>" style="display: none;">
-            <td colspan="5">
-                <?php
-                $stmt = $pdo->prepare('SELECT * FROM Modules WHERE course_id = :course_id');
-                $stmt->execute(['course_id' => $course['course_id']]);
-                $modules = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                if ($modules):
-                    ?>
-                    <ul>
-                        <?php foreach ($modules as $module): ?>
-                            <li><?= htmlspecialchars($module['title']) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else: ?>
-                    <p>Pas de module lié</p>
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'student'): ?>
+                    <?php if (in_array($course['course_id'], $enrolled_courses)): ?>
+                        <form action="" method="post" style="display: inline;">
+                            <input type="hidden" name="course_id" value="<?= $course['course_id'] ?>">
+                            <button type="submit" name="unenroll">Se désinscrire</button>
+                        </form>
+                        <button onclick="toggleModules(<?= $course['course_id'] ?>)">Voir les Modules</button>
+                    <?php else: ?>
+                        <form action="" method="post" style="display: inline;">
+                            <input type="hidden" name="course_id" value="<?= $course['course_id'] ?>">
+                            <button type="submit" name="enroll">S'inscrire</button>
+                        </form>
+                    <?php endif; ?>
                 <?php endif; ?>
-
-                <!--
-                ENTRE REPERTOIRE ET AJOUTER COURS
-                -->
 
                 <?php if (isset($_SESSION['role']) && ($_SESSION['role'] == 'teacher' || $_SESSION['role'] == 'admin')): ?>
-                    <h3>Ajouter un module</h3>
-                    <form action="list.php" method="post">
-                        <input type="hidden" name="course_id" value="<?= $course['course_id'] ?>">
-                        <label for="module_title">Titre du module:</label>
-                        <input type="text" id="module_title" name="module_title" required>
-                        <br>
-                        <label for="module_description">Description:</label>
-                        <textarea id="module_description" name="module_description" required></textarea>
-                        <br>
-                        <button type="submit" name="add_module">Ajouter le module</button>
-                    </form>
+                    <button onclick="toggleModules(<?= $course['course_id'] ?>)">Voir les Modules</button>
                 <?php endif; ?>
             </td>
         </tr>
+        <?php if (isset($_SESSION['role']) && ($_SESSION['role'] == 'teacher' || $_SESSION['role'] == 'admin' || in_array($course['course_id'], $enrolled_courses))): ?>
+            <tr id="modules-<?= $course['course_id'] ?>" style="display: none;">
+                <td colspan="4">
+                    <?php
+                    $stmt = $pdo->prepare('SELECT Modules.*, Users.last_name FROM Modules JOIN Users ON Modules.teacher_id = Users.user_id WHERE course_id = :course_id ORDER BY `order`');
+                    $stmt->execute(['course_id' => $course['course_id']]);
+                    $modules = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    if ($modules): ?>
+                        <table>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Description</th>
+                                <th>Enseignant</th>
+                            </tr>
+                            <?php foreach ($modules as $module): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($module['title']) ?></td>
+                                    <td><?= htmlspecialchars($module['description']) ?></td>
+                                    <td><?= htmlspecialchars($module['last_name']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    <?php else: ?>
+                        <p>Pas de module lié</p>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endif; ?>
     <?php endforeach; ?>
-</table><br><br><br>
+</table>
 
-<?php if ($role == 'admin' || $role == 'teacher'): ?>
+<?php if (isset($_SESSION['role']) && ($_SESSION['role'] == 'teacher' || $_SESSION['role'] == 'admin')): ?>
     <h2>Ajouter un cours</h2>
     <form action="" method="post">
-        <label for="title">Titre du cours</label>
+        <label for="title">Titre du cours:</label>
         <input type="text" id="title" name="title" required>
         <br>
         <label for="description">Description:</label>
         <textarea id="description" name="description" required></textarea>
         <br>
-        <?php if ($role == 'admin'): ?>
+        <?php if ($_SESSION['role'] == 'admin'): ?>
             <label for="teacher_id">Enseignant:</label>
             <select id="teacher_id" name="teacher_id" required>
                 <?php foreach ($teachers as $teacher): ?>
@@ -142,11 +170,10 @@ $teachers = $teachers_stmt->fetchAll(PDO::FETCH_ASSOC);
             </select>
             <br>
         <?php endif; ?>
-        <input type="submit" name="add_course">Ajouter le cours</input>
-      <!--  <button type="submit" name="add_course">Ajouter le cours</button> -->
-    </form><br><br>
-
+        <button type="submit" name="add_course">Ajouter le cours</button>
+    </form>
 <?php endif; ?>
 <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
+
 </body>
 </html>
