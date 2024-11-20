@@ -16,9 +16,6 @@ if ($user_id) {
 $prenom = isset($user['first_name']) ? $user['first_name'] : 'Unknown';
 $role = isset($user['role']) ? $user['role'] : 'Unknown';
 
-echo '<p>Prénom: ' . htmlspecialchars($prenom) . '</p>';
-echo '<p>role: ' . htmlspecialchars($role) . '</p>';
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $message = htmlspecialchars($_POST['message']);
     $user_id = $_SESSION['user_id'];
@@ -60,6 +57,9 @@ try {
     <header>
         <h1>Forum</h1>
     </header>
+    <p><strong>Prénom:</strong> <?= htmlspecialchars($prenom) ?></p>
+    <p><strong>Rôle:</strong> <?= htmlspecialchars($role) ?></p>
+
     <div class="message">
         <ul>
             <?php
