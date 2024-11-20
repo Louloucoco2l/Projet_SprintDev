@@ -1,7 +1,8 @@
 <?php
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
-}require_once '../config/db.php';
+}
+require_once '../config/db.php';
 
 global $pdo;
 
@@ -22,14 +23,14 @@ switch ($page) {
         require_once '../src/views/courses/list.php';
         break;
     case 'assignments':
-        if ($role == 'teacher' || $role == 'admin') {
+        if ($role != 'guest') {
             require_once __DIR__ . '/../src/views/assignments/list.php';
         } else {
             echo 'Access denied.';
         }
         break;
     case 'submit_assignment':
-        if ($role == 'student'|| $role == 'admin') {
+        if ($role == 'student' || $role == 'admin') {
             require_once '../src/views/assignments/submit.php';
         } else {
             echo 'Access denied.';
@@ -44,32 +45,51 @@ switch ($page) {
     case 'discussion':
         require_once '../src/views/discussion.php';
         break;
+    case 'manage_users':
+        if ($role == 'admin') {
+            require_once __DIR__ . '/../src/controllers/manage_users.php';
+        } else {
+            echo 'Access denied.';
+        }
+        break;
     default:
         echo "<h1>Bienvenue sur Projet SprintDev</h1>";
         echo '<link rel="stylesheet" type="text/css" href="style.css">';
-        echo "<p>Veuillez sélectionner une section dans la barre de navigation.</p>";
         echo '<nav>
                 <ul>';
+        echo '<div class="nav-container">';
         if ($role == 'student') {
-            echo '<li><a href="?page=courses">Courses</a></li><br><br>
-                  <li><a href="?page=submit_assignment">Submit Assignment</a></li><br><br>';
+            echo '<div><a href="?page=courses">Cours</a></div><br><br>
+          <div><a href="?page=submit_assignment">Envoyer un devoir</a></div><br><br>';
         } elseif ($role == 'teacher') {
-            echo '<li><a href="?page=courses">Courses</a></li><br><br>
-                  <li><a href="?page=assignments">Assignments</a></li><br><br>';
+            echo '<div><a href="?page=courses">Cours</a></div><br><br>
+          <div><a href="?page=assignments">Voir les devoirs</a></div><br><br>';
         } elseif ($role == 'admin') {
-            echo '<li><a href="?page=courses">Courses</a></li><br><br>
-                  <li><a href="?page=assignments">Assignments</a></li><br><br>
-                  <li><a href="?page=submit_assignment">Submit Assignment</a></li><br><br>';
+            echo '<div><a href="?page=courses">Cours</a></div><br><br>
+          <div><a href="?page=assignments">Voir les devoirs</a></div><br><br>
+          <div><a href="?page=submit_assignment">Envoyer un devoir</a></div><br><br>
+          <div><a href="?page=manage_users">Gérer les utilisateurs</a></div><br><br>';
         }
-        echo '  <li><a href="?page=discussion">Discussion</a></li><br><br>
-                <li><a href="?page=profile">Profile</a></li><br><br>';
         if (isset($_SESSION['user_id'])) {
-            echo '<li><a href="logout.php">Logout</a></li>';
+            echo '<div><a href="?page=discussion">Discussion</a></div><br><br>
+          <div><a href="?page=profile">Profil</a></div><br><br>
+          <div><a href="logout.php">Déconnexion</a></div><br><br>';
         } else {
-            echo '<li><a href="?page=login">Login</a></li>';
+            echo '<div><a href="?page=login">Connexion</a></div>';
         }
+        echo '</div>';
         echo '  </ul>
               </nav>';
         break;
 }
+
+
+//TODO:quand feeback est appele?
+//TODO:extensions permises a upload
+//TODO:nom du fichier insere
+//TODO mettre a jour les if role dans le php de index selon html
+//TODO demannder au prof si necessaire modules et chapitres au sein de cours. enrollments necessaire ou tous les eleves attend tous les cours?
+//TODO lier la table submissions quand un fichier est depose par un eleve
+//TODO afficher les eleves avec leurs notes
+//TODO gerer creation mail, verif si identique existe deja
 ?>

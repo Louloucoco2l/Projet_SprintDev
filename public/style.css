@@ -1,4 +1,3 @@
-/* General Styles */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -20,7 +19,6 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Container */
 .container {
     width: 80%;
     margin: 0 auto;
@@ -29,7 +27,14 @@ a:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Header */
+.nav-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 70vh; /* Full viewport height */
+    align-items: center; /* Center items horizontally */
+}
+
 header {
     background-color: #007BFF;
     color: #fff;
@@ -59,7 +64,6 @@ nav a:hover {
     background-color: #0056b3;
 }
 
-/* Table */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -109,7 +113,6 @@ form button:hover {
     background-color: #0056b3;
 }
 
-/* Footer */
 footer {
     background-color: #007BFF;
     color: #fff;

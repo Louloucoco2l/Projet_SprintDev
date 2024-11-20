@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['role'] = $user['role'];
         header('Location: /Projet_SprintDev/public/index.php');
         exit;
     } else {
@@ -31,16 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Login</h1>
+<h1>Connexion</h1>
 <?php if (isset($error)) echo '<p>' . htmlspecialchars($error) . '</p>'; ?>
 <form action="/Projet_SprintDev/public/index.php?page=login" method="post">
     <label for="email">Email:</label>
     <input type="email" id="email" name="email" required>
     <br>
-    <label for="password">Password:</label>
+    <label for="password">Mot de passe:</label>
     <input type="password" id="password" name="password" required>
     <br>
-    <button type="submit">Login</button>
+    <button type="submit">Connexion</button>
 </form>
 </body>
 </html>

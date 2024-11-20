@@ -46,12 +46,19 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discussion</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .message {
+            height: 400px;
+            overflow-y: scroll; /*permettre de scroller si trop de messages*/
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-Bonjour <?= htmlspecialchars($prenom) ?><?php if ($role == 'admin') echo " Vous êtes admin"; ?>
 <div class="container">
     <header>
-        <h1>Premice Chat</h1>
+        <h1>Forum</h1>
     </header>
     <div class="message">
         <ul>
@@ -68,10 +75,10 @@ Bonjour <?= htmlspecialchars($prenom) ?><?php if ($role == 'admin') echo " Vous 
         <form action="/Projet_SprintDev/public/index.php?page=discussion" method="post">
             <label for="message">Message:</label>
             <textarea id="message" name="message" required></textarea>
-            <button type="submit">Send</button>
+            <button type="submit">Publier</button>
         </form>
     </div>
-    <a href="/Projet_SprintDev/public/index.php">Back to Home</a>
+    <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
 </div>
 </body>
 </html>

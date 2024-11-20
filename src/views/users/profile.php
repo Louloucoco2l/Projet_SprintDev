@@ -28,13 +28,13 @@ $updated_at = isset($user['updated_at']) ? $user['updated_at'] : 'Unknown';
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>User Profile</h1>
-<p>First Name: <?= htmlspecialchars($first_name) ?></p>
-<p>Last Name: <?= htmlspecialchars($last_name) ?></p>
+<h1>Profil</h1>
+<p>Prénom: <?= htmlspecialchars($first_name) ?></p>
+<p>Nom de famille: <?= htmlspecialchars($last_name) ?></p>
 <p>Email: <?= htmlspecialchars($email) ?></p>
 <p>Role: <?= htmlspecialchars($role) ?></p>
-<p>Account Created At: <?= htmlspecialchars($created_at) ?></p>
-<p>Last Updated At: <?= htmlspecialchars($updated_at) ?></p>
-<a href="/Projet_SprintDev/public/index.php">Back to Home</a>
+<p>Compte créé: <?= htmlspecialchars($created_at) ?></p>
+<p>Dernière modification: <?= htmlspecialchars($updated_at) ?></p>
+<a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
 </body>
 </html>
