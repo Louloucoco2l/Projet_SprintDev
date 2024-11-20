@@ -2,7 +2,7 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }require_once '../config/db.php';
-
+//talu
 global $pdo;
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
