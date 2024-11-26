@@ -42,7 +42,7 @@ $role = $user['role'] ?? 'Unknown';
 try {
     $stmt = $pdo->prepare('
         SELECT m.content, m.sent_at, u.first_name
-        FROM CourseMessages m
+        FROM courseforum m
         JOIN Users u ON m.sender_id = u.user_id
         WHERE m.course_id = :course_id
         ORDER BY m.sent_at ASC
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $message = htmlspecialchars($_POST['message']);
 
     $stmt = $pdo->prepare('
-        INSERT INTO CourseMessages (course_id, sender_id, content, sent_at)
+        INSERT INTO courseforum (course_id, sender_id, content, sent_at)
         VALUES (:course_id, :sender_id, :content, NOW())
     ');
     $stmt->execute([

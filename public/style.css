@@ -122,3 +122,27 @@ footer {
     width: 100%;
     bottom: 0;
 }
+
+/*.svg-container {
+    display: inline-block;
+    width: 10%;
+    text-align: center;
+}
+.svg-container svg {
+    width: 100%;
+    height: auto;
+}
+
+button[name="delete_course"] {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+button[name="delete_course"]:hover {
+    opacity: 0.8; !* Ajout d'un effet visuel au survol *!
+}*/
+
+
+

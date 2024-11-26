@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $message = htmlspecialchars($_POST['message']);
     $user_id = $_SESSION['user_id'];
 
-    $stmt = $pdo->prepare('INSERT INTO messages (sender_id, content, sent_at) VALUES (:sender_id, :content, NOW())');
+    $stmt = $pdo->prepare('INSERT INTO forum (sender_id, content, sent_at) VALUES (:sender_id, :content, NOW())');
     $stmt->execute([
         'sender_id' => $user_id,
         'content' => $message
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 try {
-    $stmt = $pdo->query('SELECT m.content, m.sent_at, u.first_name FROM messages m JOIN Users u ON m.sender_id = u.user_id ORDER BY m.sent_at ASC');
+    $stmt = $pdo->query('SELECT f.content, f.sent_at, u.first_name FROM forum f JOIN Users u ON f.sender_id = u.user_id ORDER BY f.sent_at ASC');
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo 'Error: ' . $e->getMessage();
