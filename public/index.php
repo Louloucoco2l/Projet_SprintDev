@@ -22,15 +22,8 @@ switch ($page) {
     case 'courses/list':
         require_once '../src/views/courses/list.php';
         break;
-    case 'assignment_admin_teacher':
+    case 'assignments/list':
         if ($role != 'guest') {
-            require_once __DIR__ . '/../src/views/assignments/list.php';
-        } else {
-            echo 'Access denied.';
-        }
-        break;
-    case 'assignment_student':
-        if ($role == 'student' ) {
             require_once __DIR__ . '/../src/views/assignments/list.php';
         } else {
             echo 'Access denied.';
@@ -63,14 +56,14 @@ switch ($page) {
           <div><a href="?page=discussion">Discussion</a></div><br><br>';
         }
         if($role == 'teacher'){
-            echo '<div><a href="?page=assignment_admin_teacher">Voir les devoirs</a></div><br><br>';
+            echo '<div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>';
         }
         if ($role == 'admin') {//TODO: ajouter un lien par eleve voir notes
             echo '<div><a href="?page=manage_users">Gérer les utilisateurs</a></div><br><br>
-            <div><a href="?page=assignment_admin_teacher">Voir les devoirs</a></div><br><br>';
+            <div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>';
 
         }elseif ($role == 'student') {
-            echo '<div><a href="?page=assignment_student">Voir les devoirs</a></div><br><br>';
+            echo '<div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>';
             //TODO:ajouter page vision notes
         }
         if (isset($_SESSION['user_id'])) {

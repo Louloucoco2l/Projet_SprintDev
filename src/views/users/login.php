@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         header('Location: /Projet_SprintDev/public/index.php');
         exit;
     } else {
-        $error = 'Invalid email or password';
+        $error = 'mail ou mot de passe incorrect';
     }
 }
 ?>

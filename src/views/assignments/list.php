@@ -2,6 +2,7 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
 require_once __DIR__ . '/../../../config/db.php';
 
 global $pdo;
@@ -10,57 +11,82 @@ global $pdo;
 $user_id = $_SESSION['user_id'] ?? null;
 $role = $_SESSION['role'] ?? null;
 
-if (!$user_id || !in_array($role, ['admin', 'teacher', 'student'])) {
+if (!$user_id || !in_array($role, ['admin', 'teacher'])) {
     header('Location: /Projet_SprintDev/public/index.php?page=login');
     exit;
 }
 
-// Récupération des devoirs
-$stmt = $pdo->query('SELECT a.*, m.title AS module_title 
-                     FROM Assignments a 
-                     JOIN Modules m ON a.module_id = m.module_id');
-$assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Récupérer les soumissions et les informations des devoirs
+$query = '
+SELECT
+    a.assignment_id,
+    a.title AS assignment_title,
+    a.description,
+    s.submission_id,
+    s.student_id,
+    s.submitted_at,
+    s.content,
+    s.grade,
+    s.feedback,
+    u.last_name,
+    m.title AS module_title,
+    c.title AS course_title
+FROM Assignments a
+LEFT JOIN Submissions s ON a.assignment_id = s.assignment_id
+LEFT JOIN Users u ON s.student_id = u.user_id
+LEFT JOIN Modules m ON a.module_id = m.module_id
+LEFT JOIN Courses c ON m.course_id = c.course_id
+ORDER BY a.assignment_id, s.submitted_at
+';
+$stmt = $pdo->prepare($query);
+$stmt->execute();
+$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Gestion de l'affichage des soumissions pour un devoir spécifique
-$assignment_id = $_GET['assignment_id'] ?? null;
-$submissions = [];
-if ($assignment_id && in_array($role, ['teacher', 'admin'])) {
-    $stmt = $pdo->prepare('SELECT s.*, u.first_name, u.last_name 
-                           FROM Submissions s 
-                           JOIN Users u ON s.student_id = u.user_id 
-                           WHERE s.assignment_id = :assignment_id');
-    $stmt->execute(['assignment_id' => $assignment_id]);
-    $submissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Mise à jour des notes et feedback
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_grades'])) {
-    foreach ($_POST['grades'] as $submission_id => $grade) {
-        $feedback = $_POST['feedback'][$submission_id];
-        $stmt = $pdo->prepare('UPDATE Submissions 
-                               SET grade = :grade, feedback = :feedback 
-                               WHERE submission_id = :submission_id');
-        $stmt->execute([
-            'grade' => $grade,
-            'feedback' => $feedback,
-            'submission_id' => $submission_id,
-        ]);
-
-        // Mise à jour ou insertion dans la table grades
-        $stmt = $pdo->prepare('INSERT INTO Grades (student_id, course_id, module_id, assignment_id, grade) 
-                               VALUES (:student_id, :course_id, :module_id, :assignment_id, :grade)
-                               ON DUPLICATE KEY UPDATE grade = :grade');
-        $stmt->execute([
-            'student_id' => $_POST['student_id'][$submission_id],
-            'course_id' => $_POST['course_id'],
-            'module_id' => $_POST['module_id'],
-            'assignment_id' => $assignment_id,
-            'grade' => $grade,
-        ]);
+// Structurer les données : regroupement par devoir
+$assignments = [];
+foreach ($data as $row) {
+    $assignment_id = $row['assignment_id'];
+    if (!isset($assignments[$assignment_id])) {
+        $assignments[$assignment_id] = [
+            'title' => $row['assignment_title'],
+            'description' => $row['description'],
+            'module_title' => $row['module_title'],
+            'course_title' => $row['course_title'],
+            'submissions' => []
+        ];
     }
-    header("Location: /Projet_SprintDev/public/index.php?page=assignments&assignment_id=$assignment_id");
-    exit;
+    if ($row['submission_id']) {
+        $assignments[$assignment_id]['submissions'][] = [
+            'submission_id' => $row['submission_id'],
+            'student_id' => $row['student_id'],
+            'last_name' => $row['last_name'],
+            'submitted_at' => $row['submitted_at'],
+            'content' => $row['content'],
+            'grade' => $row['grade'],
+            'feedback' => $row['feedback']
+        ];
+    }
 }
+
+// Traitement de l'enregistrement
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_grade'])) {
+    $submission_id = $_POST['submission_id'] ?? null;
+    $grade = $_POST['grade'] ?? null;
+    $feedback = $_POST['feedback'] ?? null;
+
+    if ($submission_id && $grade !== null) {
+        $query = 'UPDATE Submissions SET grade = :grade, feedback = :feedback WHERE submission_id = :submission_id';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([':grade' => $grade, ':feedback' => $feedback, ':submission_id' => $submission_id]);
+
+        $assignment_id = $_POST['assignment_id'];
+        header("Location: {$_SERVER['PHP_SELF']}?page=assignments/list&open={$assignment_id}");
+        exit;
+    }
+}
+
+// Définir l'ID du tableau à ouvrir
+$openAssignmentId = $_GET['open'] ?? null;
 ?>
 
 <!DOCTYPE html>
@@ -68,82 +94,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_grades'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Devoirs</title>
+    <title>Liste des Devoirs</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
     <header>
-        <h1>Gestion des Devoirs</h1>
+        <h1>Liste des Devoirs</h1>
     </header>
 
-    <!-- Liste des Assignments -->
-    <h2>Liste des Devoirs</h2>
     <table>
         <tr>
-            <th>Module</th>
             <th>Titre</th>
-            <th>Date Limite</th>
+            <th>Description</th>
+            <th>Module</th>
+            <th>Cours</th>
             <th>Actions</th>
         </tr>
-        <?php foreach ($assignments as $assignment): ?>
+        <?php foreach ($assignments as $id => $assignment): ?>
             <tr>
-                <td><?= htmlspecialchars($assignment['module_title']) ?></td>
                 <td><?= htmlspecialchars($assignment['title']) ?></td>
-                <td><?= htmlspecialchars($assignment['due_date']) ?></td>
+                <td><?= htmlspecialchars($assignment['description']) ?></td>
+                <td><?= htmlspecialchars($assignment['module_title']) ?></td>
+                <td><?= htmlspecialchars($assignment['course_title']) ?></td>
                 <td>
-                    <?php if (in_array($role, ['teacher', 'admin'])): ?>
-                        <a href="/Projet_SprintDev/public/index.php?page=assignments&assignment_id=<?= $assignment['assignment_id'] ?>">
-                            Voir les Rendus
-                        </a>
-                    <?php elseif ($role === 'student'): ?>
-                        <a href="/Projet_SprintDev/uploads/<?= $assignment['file_name'] ?>">Télécharger</a>
-                    <?php endif; ?>
+                    <button type="button" onclick="toggleSubmissions(<?= $id ?>)">Afficher les soumissions</button>
+                </td>
+            </tr>
+            <tr id="submissions-<?= $id ?>" style="<?= $openAssignmentId == $id ? '' : 'display:none;' ?>">
+                <td colspan="5">
+                    <table>
+                        <tr>
+                            <th>Élève</th>
+                            <th>Soumis le</th>
+                            <th>Document</th>
+                            <th>Notation</th>
+                        </tr>
+                        <?php foreach ($assignment['submissions'] as $submission): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($submission['last_name'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($submission['submitted_at'] ?? '') ?></td>
+                                <td>
+                                    <?php if (!empty($submission['content'])): ?>
+                                        <a href="/path/to/download_file.php?submission_id=<?= $submission['submission_id'] ?>" target="_blank">Télécharger</a>
+                                    <?php else: ?>
+                                        Aucun fichier
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <form method="post" action="" style="display: flex; flex-direction: column; gap: 5px;">
+                                        <input type="hidden" name="submission_id" value="<?= $submission['submission_id'] ?>">
+                                        <input type="hidden" name="assignment_id" value="<?= $id ?>">
+                                        <input type="text" name="grade" value="<?= htmlspecialchars($submission['grade'] ?? '') ?>" placeholder="Note">
+                                        <textarea name="feedback" placeholder="Feedback"><?= htmlspecialchars($submission['feedback'] ?? '') ?></textarea>
+                                        <button type="submit" name="save_grade">
+                                            <img src="/path/to/modif.jpg" alt="Save" onerror="this.style.display='none';">
+                                            <span style="display: inline-block;">Save</span>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
                 </td>
             </tr>
         <?php endforeach; ?>
     </table>
-
-    <!-- Détails des Submissions -->
-    <?php if ($assignment_id && $submissions): ?>
-        <h2>Soumissions pour le Devoir: <?= htmlspecialchars($assignments[array_search($assignment_id, array_column($assignments, 'assignment_id'))]['title']) ?></h2>
-        <form method="post">
-            <input type="hidden" name="course_id" value="<?= $assignments[0]['course_id'] ?>">
-            <input type="hidden" name="module_id" value="<?= $assignments[0]['module_id'] ?>">
-            <table>
-                <tr>
-                    <th>Élève</th>
-                    <th>Soumission</th>
-                    <th>Heure de Rendu</th>
-                    <th>Note</th>
-                    <th>Feedback</th>
-                </tr>
-                <?php foreach ($submissions as $submission): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($submission['first_name'] . ' ' . $submission['last_name']) ?></td>
-                        <td>
-                            <a href="/Projet_SprintDev/public/download.php?submission_id=<?= $submission['submission_id'] ?>">Télécharger</a>
-                        </td>
-                        <td><?= htmlspecialchars($submission['submitted_at']) ?></td>
-                        <td>
-                            <input type="number" name="grades[<?= $submission['submission_id'] ?>]"
-                                   value="<?= htmlspecialchars($submission['grade'] ?? '') ?>" step="0.01" min="0" max="20">
-                        </td>
-                        <td>
-                            <textarea name="feedback[<?= $submission['submission_id'] ?>]"><?= htmlspecialchars($submission['feedback'] ?? '') ?></textarea>
-                        </td>
-                        <input type="hidden" name="student_id[<?= $submission['submission_id'] ?>]"
-                               value="<?= $submission['student_id'] ?>">
-                    </tr>
-                <?php endforeach; ?>
-            </table>
-            <button type="submit" name="update_grades">Enregistrer</button>
-        </form>
-    <?php elseif ($assignment_id): ?>
-        <p>Aucune soumission trouvée pour ce devoir.</p>
-    <?php endif; ?>
-
-    <a href="/Projet_SprintDev/public/index.php">Retour</a>
 </div>
+
+<script>
+    function toggleSubmissions(assignmentId) {
+        const element = document.getElementById('submissions-' + assignmentId);
+        element.style.display = element.style.display === 'none' ? '' : 'none';
+    }
+</script>
 </body>
 </html>
