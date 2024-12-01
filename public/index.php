@@ -18,6 +18,8 @@ if (isset($_SESSION['user_id'])) {
     $role = 'guest';
 }
 
+
+
 switch ($page) {
     case 'courses/list':
         require_once '../src/views/courses/list.php';
@@ -25,6 +27,13 @@ switch ($page) {
     case 'assignments/list':
         if ($role != 'guest') {
             require_once __DIR__ . '/../src/views/assignments/list.php';
+        } else {
+            echo 'Access denied.';
+        }
+        break;
+    case 'assignments/view_grades':
+        if ($role != 'guest') {
+            require_once __DIR__ . '/../src/views/assignments/view_grades.php';
         } else {
             echo 'Access denied.';
         }
@@ -63,7 +72,8 @@ switch ($page) {
             <div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>';
 
         }elseif ($role == 'student') {
-            echo '<div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>';
+            echo '<div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>
+            <div><a href="?page=assignments/view_grades">Voir les notes</a></div><br><br>';
             //TODO:ajouter page vision notes
         }
         if (isset($_SESSION['user_id'])) {

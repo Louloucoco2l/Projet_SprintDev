@@ -83,7 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion du Module</title>
-    <link rel="stylesheet" href="../../../../public/styles.css">
+    <link rel="stylesheet" href="/Projet_SprintDev/public/style.css">
+
 </head>
 <body>
 <div class="container">
@@ -93,8 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && 
 
     <!-- Liste des assignments -->
     <section>
-        <h2>Assignments</h2>
+        <h2>Devoirs</h2>
         <table>
+            <thead>
             <tr>
                 <th>Titre</th>
                 <th>Description</th>
@@ -102,6 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && 
                 <th>Fichier</th>
                 <th>Actions</th>
             </tr>
+            </thead>
+            <tbody>
             <?php foreach ($assignments as $assignment): ?>
                 <tr>
                     <td><?= htmlspecialchars($assignment['title']) ?></td>
@@ -109,49 +113,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && 
                     <td><?= htmlspecialchars($assignment['due_date']) ?></td>
                     <td>
                         <?php if (!empty($assignment['file_name'])): ?>
-                            <a href="download_assignment.php?assignment_id=<?= $assignment['assignment_id'] ?>">Télécharger</a>
+                            <a href="/Projet_SprintDev/src/views/assignments/download_file.php?type=assignment&id=<?= urlencode($assignment['assignment_id']) ?>">Télécharger</a>
                         <?php else: ?>
                             Aucun fichier
                         <?php endif; ?>
                     </td>
                     <td>
                         <?php if ($role === 'student'): ?>
-                            <a href="/Projet_SprintDev/src/views/assignments/submit_assignment.php?assignment_id=<?= $assignment['assignment_id'] ?>">Soumettre un devoir</a>
+                            <a href="/Projet_SprintDev/src/views/assignments/submit_assignment.php?assignment_id=<?= $assignment['assignment_id'] ?>">Soumettre</a>
                         <?php endif; ?>
 
                         <?php if (in_array($role, ['admin', 'teacher'])): ?>
-                            <a href="/Projet_SprintDev/src/views/assignments/view_submissions.php?assignment_id=<?= $assignment['assignment_id'] ?>">Voir les soumissions</a>
+                            <a href="/Projet_SprintDev/src/views/assignments/view_submissions.php?assignment_id=<?= $assignment['assignment_id'] ?>">Voir soumissions</a>
                         <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
+            </tbody>
         </table>
 
         <?php if (in_array($role, ['admin', 'teacher'])): ?>
-            <!-- Formulaire pour ajouter un assignment -->
-            <h3>Ajouter un assignment</h3>
-            <form action="" method="post" enctype="multipart/form-data">
-                <label for="title">Titre :</label>
-                <input type="text" name="title" required>
+            <div class="form-section">
+                <h3>Ajouter un devoir</h3>
+                <form action="" method="post" enctype="multipart/form-data">
+                    <label for="title">Titre :</label>
+                    <input type="text" name="title" required>
 
-                <label for="description">Description :</label>
-                <textarea name="description" required></textarea>
+                    <label for="description">Description :</label>
+                    <textarea name="description" required></textarea>
 
-                <label for="due_date">Date limite :</label>
-                <input type="date" name="due_date" required>
+                    <label for="due_date">Date limite :</label>
+                    <input type="date" name="due_date" required>
 
-                <label for="file_name">Nouveau nom du fichier :</label>
-                <input type="text" name="file_name">
+                    <label for="file_name">Nouveau nom du fichier :</label>
+                    <input type="text" name="file_name">
 
-                <label for="file_content">Fichier associé :</label>
-                <input type="file" name="file_content">
+                    <label for="file_content">Fichier associé :</label>
+                    <input type="file" name="file_content">
 
-                <button type="submit" name="add_assignment">Ajouter</button>
-            </form>
+                    <button type="submit" name="add_assignment">Ajouter</button>
+                </form>
+            </div>
         <?php endif; ?>
     </section>
-    <a href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a><br>
-    <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
+        <a href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a> |
+        <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
 </div>
 </body>
 </html>

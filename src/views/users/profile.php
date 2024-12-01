@@ -25,7 +25,7 @@ $updated_at = isset($user['updated_at']) ? $user['updated_at'] : 'Unknown';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/Projet_SprintDev/public/style.css">
 </head>
 <body>
 <h1>Profil</h1>

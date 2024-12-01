@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <!-- Lien de retour aux cours -->
-    <a href="/Projet_SprintDev/public/index.php?page=courses">Retour aux cours</a>
+    <a href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a>
 </div>
 </body>
 </html>

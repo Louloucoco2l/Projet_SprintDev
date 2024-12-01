@@ -203,20 +203,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
                                     <td><?= htmlspecialchars($module['title']) ?></td>
                                     <td><?= htmlspecialchars($module['description']) ?></td>
                                     <td>
-                                        <?php if (in_array($role, [!['guest']])): ?>
+
+                                        <?php if (in_array($role, ['teacher', 'admin'])): ?>
                                             <form action="/Projet_SprintDev/src/views/courses/gestion_module.php" method="get" style="width: 55%; display:inline-block;">
                                                 <input type="hidden" name="module_id" value="<?= $module['module_id'] ?>">
-                                                <button type="submit">Voir le Module</button>
+                                                <button type="submit">Gérer Module</button>
                                             </form>
-                                        <?php endif; ?>
 
-                                        <?php if (in_array($role, ['admin', 'teacher'])): ?>
                                             <form action="" method="post" style="width: 40%; display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce module ?')">
                                                 <input type="hidden" name="module_id" value="<?= $module['module_id'] ?>">
                                                 <button type="submit" name="delete_module">Supprimer Module</button>
                                             </form>
                                         <?php endif; ?>
 
+                                        <?php if ($role === 'student'): ?>
+                                            <form action="/Projet_SprintDev/src/views/courses/gestion_module.php" method="get" style="width: 100%; display:inline-block;">
+                                                <input type="hidden" name="module_id" value="<?= $module['module_id'] ?>">
+                                                <button type="submit">Gérer Module</button>
+                                            </form>
+
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -277,4 +283,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
 
 </div>
 </body>
-</html>
