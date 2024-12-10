@@ -37,48 +37,51 @@ try {
     echo 'Error: ' . $e->getMessage();
 }
 ?>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discussion</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        .message {
-            height: 400px;
-            overflow-y: scroll; /*permettre de scroller si trop de messages*/
-            border: 1px solid #ccc;
-            padding: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="/Projet_SprintDev/public/style.css">
 </head>
 <body>
+<header>
+    <h1>Forum de discussion</h1>
+</header>
 <div class="container">
-    <header>
-        <h1>Forum</h1>
-    </header>
-    <p><strong>Prénom:</strong> <?= htmlspecialchars($prenom) ?></p>
-    <p><strong>Rôle:</strong> <?= htmlspecialchars($role) ?></p>
+    <p><strong>Prénom :</strong> <?= htmlspecialchars($prenom) ?></p>
+    <p><strong>Rôle :</strong> <?= htmlspecialchars($role) ?></p>
 
     <div class="message">
         <ul>
-            <?php
-            if (isset($messages)) {
-                foreach ($messages as $message) {
-                    echo "<li><strong>" . htmlspecialchars($message['first_name']) . "</strong> : " . htmlspecialchars($message['content']) . " <br> <span>" . $message['sent_at'] . "</span></li>";
-                }
-            }
-            ?>
+            <?php if (!empty($messages)): ?>
+                <?php foreach ($messages as $message): ?>
+                    <li>
+                        <strong><?= htmlspecialchars($message['first_name']) ?></strong> : <?= htmlspecialchars($message['content']) ?>
+                        <br>
+                        <span>Posté le <?= $message['sent_at'] ?></span>
+                    </li>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>Aucun message pour l'instant. Soyez le premier à participer !</p>
+            <?php endif; ?>
         </ul>
     </div>
+
     <div class="formulaire">
         <form action="/Projet_SprintDev/public/index.php?page=discussion" method="post">
-            <label for="message">Message:</label>
+            <label for="message">Votre message :</label>
             <textarea id="message" name="message" required></textarea>
             <button type="submit">Publier</button>
         </form>
     </div>
-    <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
+
+    <br><br>
+
 </div>
+<footer>
+    <p>&copy; 2024 Projet SprintDev</p>
+</footer>
 </body>
 </html>

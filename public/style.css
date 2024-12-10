@@ -31,8 +31,8 @@ a:hover {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 70vh; /* Full viewport height */
-    align-items: center; /* Center items horizontally */
+    height: 70vh;
+    align-items: center;
 }
 
 header {
@@ -112,7 +112,19 @@ form button {
 form button:hover {
     background-color: #0056b3;
 }
-
+/*notif pour reset password*/
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+.alert-warning a {
+    color: blue;
+    text-decoration: underline;
+}
 footer {
     background-color: #007BFF;
     color: #fff;
@@ -121,7 +133,72 @@ footer {
     position: fixed;
     width: 100%;
     bottom: 0;
+    z-index: 10; /* Ensures the footer stays above content when scrolling */
+}
+
+.return-link {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.home-button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.home-button:hover {
+    background-color: #0056b3;
 }
 
 
+.message {
+    height: 400px;
+    overflow-y: auto; /* Activer le scroll si nécessaire */
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.message ul {
+    list-style: none;
+    padding: 0;
+}
+
+.message li {
+    margin-bottom: 10px;
+}
+
+.message li span {
+    font-size: 0.85em;
+    color: #777;
+}
+
+.formulaire form textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.formulaire form button {
+    display: block;
+    width: 100%;
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.formulaire form button:hover {
+    background-color: #0056b3;
+}
 

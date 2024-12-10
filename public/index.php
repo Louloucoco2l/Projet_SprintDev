@@ -7,18 +7,30 @@ require_once '../config/db.php';
 global $pdo;
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+$title = ucfirst(str_replace('/', ' ', $page));
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $stmt = $pdo->prepare('SELECT role FROM Users WHERE user_id = :user_id');
+    $stmt = $pdo->prepare('SELECT role, password_reset_required FROM Users WHERE user_id = :user_id');
     $stmt->execute(['user_id' => $user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     $role = $user['role'];
+
+    // Vérifier si une réinitialisation de mot de passe est requise
+    if ($user['password_reset_required']) {
+        $_SESSION['notification'] = "Votre mot de passe doit être réinitialisé. 
+        <a href='?page=profile' class='alert alert-warning' style='color: blue; text-decoration: underline;'>Cliquez ici pour le réinitialiser.</a>";
+    }
 } else {
     $role = 'guest';
 }
 
+// Récupérer la notification si elle existe
+$notification = $_SESSION['notification'] ?? null;
+unset($_SESSION['notification']);
 
+// Commencer la mise en tampon de sortie
+ob_start();
 
 switch ($page) {
     case 'courses/list':
@@ -55,46 +67,37 @@ switch ($page) {
         }
         break;
     default:
-        echo "<h1>Bienvenue sur Projet SprintDev</h1>";
+        // Page d'accueil
         echo '<link rel="stylesheet" type="text/css" href="style.css">';
-        echo '<nav>
-                <ul>';
+        echo '<nav><ul>';
         echo '<div class="nav-container">';
         if (isset($_SESSION['user_id'])) {
             echo '<div><a href="?page=courses/list">Cours</a></div><br><br>
-          <div><a href="?page=discussion">Discussion</a></div><br><br>';
+                  <div><a href="?page=discussion">Discussion</a></div><br><br>';
         }
-        if($role == 'teacher'){
+        if ($role == 'teacher') {
             echo '<div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>';
         }
-        if ($role == 'admin') {//TODO: ajouter un lien par eleve voir notes
+        if ($role == 'admin') {
             echo '<div><a href="?page=manage_users">Gérer les utilisateurs</a></div><br><br>
-            <div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>';
-
-        }elseif ($role == 'student') {
+                  <div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>';
+        } elseif ($role == 'student') {
             echo '<div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>
-            <div><a href="?page=assignments/view_grades">Voir les notes</a></div><br><br>';
-            //TODO:ajouter page vision notes
+                  <div><a href="?page=assignments/view_grades">Voir les notes</a></div><br><br>';
         }
-        if (isset($_SESSION['user_id'])) {
+        /*if (isset($_SESSION['user_id'])) {
             echo '<div><a href="?page=profile">Profil</a></div><br><br>
-          <div><a href="logout.php">Déconnexion</a></div><br><br>';
-        } else {
+                  <div><a href="logout.php">Déconnexion</a></div><br><br>';
+        } */else {
             echo '<div><a href="?page=login">Connexion</a></div>';
         }
         echo '</div>';
-        echo '  </ul>
-              </nav>';
+        echo '</ul></nav>';
         break;
 }
 
+// Récupérer le contenu de la page
+$content = ob_get_clean();
 
-//TODO:quand feeback est appele?
-//TODO:extensions permises a upload
-//TODO:nom du fichier insere
-//TODO mettre a jour les if role dans le php de index selon html
-//TODO demannder au prof si necessaire modules et chapitres au sein de cours. enrollments necessaire ou tous les eleves attend tous les cours?
-//TODO lier la table submissions quand un fichier est depose par un eleve
-//TODO afficher les eleves avec leurs notes
-//TODO gerer creation mail, verif si identique existe deja
-?>
+// Inclure le layout global
+include __DIR__ . '/layout.php';

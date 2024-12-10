@@ -5,6 +5,9 @@ if (session_status() == PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../../config/db.php';
 global $pdo;
 
+$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+$title = ucfirst(str_replace('/', ' ', $page));
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['assignment_name']) && isset($_FILES['assignment_file'])) {
         $assignment_name = $_POST['assignment_name'];
@@ -54,6 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo 'Nom du devoir ou fichier manquant.';
     }
 }
+
+// Récupérer la notification si elle existe
+$notification = $_SESSION['notification'] ?? null;
+unset($_SESSION['notification']);
+// Commencer la mise en tampon de sortie
+ob_start();
+
 ?>
 
 <!DOCTYPE html>
@@ -62,9 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <title>Envoyer un devoir</title>
     <link rel="stylesheet" type="text/css" href="../../../public/style.css">
+    <header>
+        <h1>Envoyer un devoir</h1>
+    </header>
 </head>
 <body>
-<h2>Envoyer un devoir</h2>
 <form action="submit_assignment.php" method="post" enctype="multipart/form-data">
     <label for="assignment_name">Nom du fichier :</label>
     <input type="text" id="assignment_name" name="assignment_name" required>
@@ -75,7 +87,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <input type="hidden" name="assignment_id" value="<?= isset($_GET['assignment_id']) ? htmlspecialchars($_GET['assignment_id']) : '' ?>">
     <button type="submit">Envoyer</button>
 </form>
-<a href="/Projet_SprintDev/public/index.php?page=manage_courses">Retour aux cours</a><br>
-<a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
 </body>
 </html>
+
+
+<?php
+// Récupérer le contenu de la page
+$content = ob_get_clean();
+
+// Inclure le layout global
+include __DIR__ . '/../../../public/layout.php';
+?>

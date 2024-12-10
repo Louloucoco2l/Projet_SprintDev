@@ -6,6 +6,9 @@ require_once __DIR__ . '/../../../config/db.php';
 
 global $pdo;
 
+$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+$title = ucfirst(str_replace('/', ' ', $page));
+
 // Vérification de l'utilisateur connecté
 $user_id = $_SESSION['user_id'] ?? null;
 $role = $_SESSION['role'] ?? null;
@@ -75,6 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && 
     header('Location: gestion_module.php?module_id=' . $module_id);
     exit;
 }
+
+// Récupérer la notification si elle existe
+$notification = $_SESSION['notification'] ?? null;
+unset($_SESSION['notification']);
+// Commencer la mise en tampon de sortie
+ob_start();
+
 ?>
 
 <!DOCTYPE html>
@@ -84,13 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion du Module</title>
     <link rel="stylesheet" href="/Projet_SprintDev/public/style.css">
-
-</head>
-<body>
-<div class="container">
     <header>
         <h1>Gestion du Module : <?= htmlspecialchars($module['title']) ?></h1>
     </header>
+</head>
+<body>
+<div class="container">
 
     <!-- Liste des assignments -->
     <section>
@@ -124,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && 
                         <?php endif; ?>
 
                         <?php if (in_array($role, ['admin', 'teacher'])): ?>
-                            <a href="/Projet_SprintDev/src/views/assignments/view_submissions.php?assignment_id=<?= $assignment['assignment_id'] ?>">Voir soumissions</a>
+                            <a href="/Projet_SprintDev/public/index.php?page=assignments/list">Voir soumissions</a>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -156,8 +165,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && 
             </div>
         <?php endif; ?>
     </section>
-        <a href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a> |
-        <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
+        <a href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a>
+        <br><br><br><br>
 </div>
 </body>
 </html>
+
+<?php
+// Récupérer le contenu de la page
+$content = ob_get_clean();
+
+// Inclure le layout global
+include __DIR__ . '/../../../public/layout.php';
+?>

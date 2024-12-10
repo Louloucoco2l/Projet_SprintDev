@@ -111,12 +111,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
             row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
         }
     </script>
-</head>
-<body>
-<div class="container">
     <header>
         <h1>Gestion des cours et modules</h1>
     </header>
+</head>
+<body>
+<div class="container">
+
 
     <h2>Gestion des cours existants</h2>
     <table>
@@ -207,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
                                         <?php if (in_array($role, ['teacher', 'admin'])): ?>
                                             <form action="/Projet_SprintDev/src/views/courses/gestion_module.php" method="get" style="width: 55%; display:inline-block;">
                                                 <input type="hidden" name="module_id" value="<?= $module['module_id'] ?>">
-                                                <button type="submit">Gérer Module</button>
+                                                <button type="submit">Voir le Module</button>
                                             </form>
 
                                             <form action="" method="post" style="width: 40%; display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce module ?')">
@@ -219,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
                                         <?php if ($role === 'student'): ?>
                                             <form action="/Projet_SprintDev/src/views/courses/gestion_module.php" method="get" style="width: 100%; display:inline-block;">
                                                 <input type="hidden" name="module_id" value="<?= $module['module_id'] ?>">
-                                                <button type="submit">Gérer Module</button>
+                                                <button type="submit">Voir le Module</button>
                                             </form>
 
                                         <?php endif; ?>
@@ -279,7 +280,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
             <button type="submit" name="add_course">Ajouter le cours</button>
         </form>
     <?php endif; ?>
-    <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
+
+
+    <br> <br><br> <br>
 
 </div>
+<footer>
+    <p>&copy; 2024 Projet SprintDev</p>
+</footer>
 </body>
+</html>
+

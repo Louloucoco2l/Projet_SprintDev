@@ -201,12 +201,13 @@ $openAssignmentId = $_GET['open'] ?? null;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Devoirs</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="container">
     <header>
         <h1>Liste des Devoirs</h1>
     </header>
+</head>
+<body>
+<div class="container">
+
 
     <table>
         <tr>
@@ -283,8 +284,14 @@ $openAssignmentId = $_GET['open'] ?? null;
             <?php endif; ?>
         <?php endforeach; ?>
     </table>
-    <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
+
+<!--<nav>
+    <a href="/Projet_SprintDev/public/index.php">Retour à la page d'accueil</a>
+</nav>-->
 </div>
+<footer>
+    <p>&copy; 2024 Projet SprintDev</p>
+</footer>
 
 <script>
     function toggleSubmissions(assignmentId) {

@@ -6,6 +6,9 @@ require_once __DIR__ . '/../../../config/db.php';
 
 global $pdo;
 
+$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+$title = ucfirst(str_replace('/', ' ', $page));
+
 // Vérifier si l'utilisateur est connecté
 $user_id = $_SESSION['user_id'] ?? null;
 if (!$user_id) {
@@ -70,6 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header('Location: /Projet_SprintDev/src/views/courses/chat_course.php?course_id=' . $course_id);
     exit;
 }
+
+// Récupérer la notification si elle existe
+$notification = $_SESSION['notification'] ?? null;
+unset($_SESSION['notification']);
+// Commencer la mise en tampon de sortie
+ob_start();
+
 ?>
 
 <!DOCTYPE html>
@@ -128,4 +138,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <a href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a>
 </div>
 </body>
+<br><br><br><br>
 </html>
+
+<?php
+// Récupérer le contenu de la page
+$content = ob_get_clean();
+
+// Inclure le layout global
+include __DIR__ . '/../../../public/layout.php';
+?>

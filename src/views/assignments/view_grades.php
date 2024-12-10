@@ -56,9 +56,9 @@ if ($role === 'admin') {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
+<div>
     <header>
-        <h1>Notes de <?= $role === 'student' ? 'vos cours' : htmlspecialchars($student_name) ?></h1>
+        <h1>Notes de <?= $role === 'student' ? 'vos rendus' : htmlspecialchars($student_name) ?></h1>
     </header>
 
     <?php if (empty($grades)): ?>
@@ -88,7 +88,10 @@ if ($role === 'admin') {
         </table>
     <?php endif; ?>
 
-    <a href="/Projet_SprintDev/public/index.php">Page d'accueil</a>
+
 </div>
+<footer>
+    <p>&copy; 2024 Projet SprintDev</p>
+</footer>
 </body>
 </html>
