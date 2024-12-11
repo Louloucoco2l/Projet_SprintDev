@@ -20,28 +20,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         header('Location: /Projet_SprintDev/public/index.php');
         exit;
     } else {
-        $error = 'mail ou mot de passe incorrect';
+        $error = 'Adresse email ou mot de passe incorrect.';
     }
 }
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Connexion</title>
     <link rel="stylesheet" href="style.css">
+    <header><h1>Connexion</h1></header>
 </head>
 <body>
-<h1>Connexion</h1>
-<?php if (isset($error)) echo '<p>' . htmlspecialchars($error) . '</p>'; ?>
-<form action="/Projet_SprintDev/public/index.php?page=login" method="post">
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
-    <br>
-    <label for="password">Mot de passe:</label>
-    <input type="password" id="password" name="password" required>
-    <br>
-    <button type="submit">Connexion</button>
-</form>
+
+<main class="container petite_page">
+    <?php if (isset($error)): ?>
+        <div class="alert-warning">
+            <p><?= htmlspecialchars($error) ?></p>
+        </div>
+    <?php endif; ?>
+    <form action="/Projet_SprintDev/public/index.php?page=login" method="post" class="formulaire">
+        <label for="email">Email :</label>
+        <input type="email" id="email" name="email" placeholder="Entrez votre email" required>
+
+        <label for="password">Mot de passe :</label>
+        <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" required>
+
+        <button type="submit">Connexion</button>
+    </form>
+
+</main>
+
 </body>
 </html>

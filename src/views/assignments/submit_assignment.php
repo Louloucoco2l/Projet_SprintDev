@@ -3,6 +3,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 require_once __DIR__ . '/../../../config/db.php';
+
 global $pdo;
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
@@ -76,6 +77,7 @@ ob_start();
         <h1>Envoyer un devoir</h1>
     </header>
 </head>
+<div class="petite_page">
 <body>
 <form action="submit_assignment.php" method="post" enctype="multipart/form-data">
     <label for="assignment_name">Nom du fichier :</label>
@@ -88,6 +90,7 @@ ob_start();
     <button type="submit">Envoyer</button>
 </form>
 </body>
+</div>
 </html>
 
 

@@ -80,8 +80,6 @@ try {
     <br><br>
 
 </div>
-<footer>
-    <p>&copy; 2024 Projet SprintDev</p>
-</footer>
+
 </body>
 </html>

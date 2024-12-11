@@ -135,10 +135,9 @@ ob_start();
     </div>
 
     <!-- Lien de retour aux cours -->
-    <a href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a>
+    <a class ="return-link"  href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a>
 </div>
 </body>
-<br><br><br><br>
 </html>
 
 <?php

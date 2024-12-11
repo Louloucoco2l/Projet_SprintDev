@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../../config/db.php';
 global $pdo;
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+
 $title = ucfirst(str_replace('/', ' ', $page));
 
 // Vérification de l'utilisateur connecté
@@ -37,6 +38,7 @@ if (!$module) {
 $stmt = $pdo->prepare('SELECT * FROM Assignments WHERE module_id = :module_id ORDER BY due_date ASC');
 $stmt->execute(['module_id' => $module_id]);
 $assignments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Gestion des actions POST (ajouter un assignment)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_assignment']) && in_array($role, ['admin', 'teacher'])) {
@@ -99,6 +101,7 @@ ob_start();
     </header>
 </head>
 <body>
+<div class="petite_page">
 <div class="container">
 
     <!-- Liste des assignments -->
@@ -118,6 +121,8 @@ ob_start();
             <?php foreach ($assignments as $assignment): ?>
                 <tr>
                     <td><?= htmlspecialchars($assignment['title']) ?></td>
+                    <td><?= ($assignment['title']); ?></td>  <!--Vulnérable si $user['first_name'] contient du code malveillant comme <script>alert('XSS')</script>.  -->
+
                     <td><?= htmlspecialchars($assignment['description']) ?></td>
                     <td><?= htmlspecialchars($assignment['due_date']) ?></td>
                     <td>
@@ -167,6 +172,7 @@ ob_start();
     </section>
         <a href="/Projet_SprintDev/public/index.php?page=courses/list">Retour aux cours</a>
         <br><br><br><br>
+</div>
 </div>
 </body>
 </html>

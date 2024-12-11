@@ -289,9 +289,7 @@ $openAssignmentId = $_GET['open'] ?? null;
     <a href="/Projet_SprintDev/public/index.php">Retour à la page d'accueil</a>
 </nav>-->
 </div>
-<footer>
-    <p>&copy; 2024 Projet SprintDev</p>
-</footer>
+
 
 <script>
     function toggleSubmissions(assignmentId) {

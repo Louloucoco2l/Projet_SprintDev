@@ -68,6 +68,7 @@ $password_reset_required = $user['password_reset_required'];
     </header>
 </head>
 <body>
+<div class="petite_page">
 
 <div class="container">
     <?php if (!empty($success_message)): ?>
@@ -123,6 +124,7 @@ $password_reset_required = $user['password_reset_required'];
 
 
 </div>
-<br><br><br>
+</div>
+
 </body>
 </html>

@@ -6,6 +6,8 @@ require_once __DIR__ . '/../../config/db.php';
 
 global $pdo;
 
+
+
 $error_message = '';
 $success_message = '';
 
@@ -63,6 +65,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error_message = 'Erreur lors de la création de l\'utilisateur.';
         }
     }
+}
+
+if (!$user_id || !($role ['admin'])) {
+    header('Location: /Projet_SprintDev/public/index.php?page=login');
+    exit;
 }
 
 // Récupérer les utilisateurs
@@ -171,12 +178,9 @@ try {
     <br>
     <button type="submit" name="create_user">Créer l'utilisateur</button>
 </form>
-<br><br><br><br>
 
 </div>
-<footer>
-    <p>&copy; 2024 Projet SprintDev</p>
-</footer>
+
 </body>
 </html>
 </body>

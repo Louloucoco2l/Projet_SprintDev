@@ -85,10 +85,9 @@ switch ($page) {
             echo '<div><a href="?page=assignments/list">Voir les devoirs</a></div><br><br>
                   <div><a href="?page=assignments/view_grades">Voir les notes</a></div><br><br>';
         }
-        /*if (isset($_SESSION['user_id'])) {
-            echo '<div><a href="?page=profile">Profil</a></div><br><br>
-                  <div><a href="logout.php">Déconnexion</a></div><br><br>';
-        } */else {
+        if (isset($_SESSION['user_id'])) {
+            echo '';
+        } else {
             echo '<div><a href="?page=login">Connexion</a></div>';
         }
         echo '</div>';

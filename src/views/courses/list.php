@@ -131,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
             <tr>
                 <td style="width: 15%;"><?= htmlspecialchars($course['title']) ?></td>
                 <td style="width: 15%;"><?= htmlspecialchars($course['description']) ?></td>
-                <td style="width: 15%;"><?= htmlspecialchars($course['teacher_name']) ?></td>
-                <td style="width: 55%;"><!--autres actions-->
+                <td style="width: 10%;"><?= htmlspecialchars($course['teacher_name']) ?></td>
+                <td style="width: 60%;"><!--autres actions-->
 
 
                     <?php if ($role === 'student'): ?>
@@ -158,12 +158,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
 
 
                     <?php if ($role === 'admin'): ?>
-                        <form action="" method="post" style="width: 65%; display:inline-block;">
+                        <form action="" method="post" style="width: 45%; display:inline-block;">
                             <input type="hidden" name="course_id" value="<?= $course['course_id'] ?>">
                             <button type="button" onclick="toggleModules(<?= $course['course_id'] ?>)" style="width: 100%;">Afficher les modules</button>
                         </form>
 
-                        <form action="" method="post" style="width: 20%; display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce cours ?');">
+                        <form action="" method="post" style="width: 40%; display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce cours ?');">
                             <input type="hidden" name="course_id" value="<?= $course['course_id'] ?>">
                             <button type="submit" name="delete_course">Supprimer Cours</button>
                         </form>
@@ -196,8 +196,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
                             <tr>
 
                                 <th style="width: 20%;">Module</th>
-                                <th style="width: 50%;">Description</th>
-                                <th style="width: 30%;">Actions</th>
+                                <th style="width: 30%;">Description</th>
+                                <th style="width: 50%;">Actions</th>
                             </tr>
                             <?php foreach ($modules as $module): ?>
                                 <tr>
@@ -282,12 +282,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
     <?php endif; ?>
 
 
-    <br> <br><br> <br>
 
 </div>
-<footer>
-    <p>&copy; 2024 Projet SprintDev</p>
-</footer>
+
 </body>
 </html>
 

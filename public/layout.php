@@ -3,6 +3,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+//header("Content-Security-Policy: default-src 'self'; script-src 'self';");
 
 // Si l'utilisateur est connecté et que le mot de passe doit être réinitialisé, afficher la notification
 if (isset($_SESSION['user_id'])) {
@@ -31,18 +32,19 @@ if (isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/Projet_SprintDev/public/style.css">
     <title><?= $title ?? 'Projet SprintDev' ?></title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 <body>
 <header>
     <!-- En-tête global -->
     <nav>
-        <a href="/Projet_SprintDev/public/index.php">Accueil</a>
-        <a href="/Projet_SprintDev/public/index.php?page=profile">Mon Profil</a>
+        <a href="/Projet_SprintDev/public/index.php"><i class='bx bx-home-alt icon-large'></i></a>
+<a href="/Projet_SprintDev/public/index.php?page=profile"><i class='bx bx-user icon-large'></i></a>
 
-        <!-- Ajouter le lien de déconnexion si l'utilisateur est connecté -->
-        <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="/Projet_SprintDev/public/logout.php">Déconnexion</a>
-        <?php endif; ?>
+<!-- Ajouter le lien de déconnexion si l'utilisateur est connecté -->
+<?php if (isset($_SESSION['user_id'])): ?>
+    <a href="/Projet_SprintDev/public/logout.php"><i class='bx bx-log-out-circle icon-large'></i></a>
+<?php endif; ?>
     </nav>
 </header>
 

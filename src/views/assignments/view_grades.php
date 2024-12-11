@@ -28,12 +28,14 @@ $stmt = $pdo->prepare("
         g.fback, 
         c.title AS course_title, 
         m.title AS module_title, 
+        a.title AS assignment_title, 
         g.submission_id
     FROM Grades g
     JOIN Courses c ON g.course_id = c.course_id
     JOIN Modules m ON g.module_id = m.module_id
+    JOIN Assignments a ON a.assignment_id = (SELECT assignment_id FROM Submissions WHERE submission_id = g.submission_id)
     WHERE g.student_id = :student_id
-    ORDER BY c.title, m.title
+    ORDER BY c.title, m.title, a.title
 ");
 $stmt->execute(['student_id' => $student_id]);
 $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -56,7 +58,7 @@ if ($role === 'admin') {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div>
+<div class="petite_page">
     <header>
         <h1>Notes de <?= $role === 'student' ? 'vos rendus' : htmlspecialchars($student_name) ?></h1>
     </header>
@@ -69,7 +71,7 @@ if ($role === 'admin') {
             <tr>
                 <th>Cours</th>
                 <th>Module</th>
-                <th>Soumission</th>
+                <th>Titre du devoir</th>
                 <th>Note</th>
                 <th>Feedback</th>
             </tr>
@@ -79,7 +81,7 @@ if ($role === 'admin') {
                 <tr>
                     <td><?= htmlspecialchars($grade['course_title']) ?></td>
                     <td><?= htmlspecialchars($grade['module_title']) ?></td>
-                    <td><?= htmlspecialchars($grade['submission_id']) ?></td>
+                    <td><?= htmlspecialchars($grade['assignment_title']) ?></td>
                     <td><?= htmlspecialchars($grade['grade']) ?></td>
                     <td><?= htmlspecialchars($grade['fback']) ?></td>
                 </tr>
@@ -87,11 +89,6 @@ if ($role === 'admin') {
             </tbody>
         </table>
     <?php endif; ?>
-
-
 </div>
-<footer>
-    <p>&copy; 2024 Projet SprintDev</p>
-</footer>
 </body>
 </html>

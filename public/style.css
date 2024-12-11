@@ -19,6 +19,10 @@ a:hover {
     text-decoration: underline;
 }
 
+.petite_page{
+    height :650px;
+}
+
 .container {
     width: 80%;
     margin: 0 auto;
@@ -130,7 +134,6 @@ footer {
     color: #fff;
     text-align: center;
     padding: 10px 0;
-    position: fixed;
     width: 100%;
     bottom: 0;
     z-index: 10; /* Ensures the footer stays above content when scrolling */
@@ -186,7 +189,9 @@ footer {
     border: 1px solid #ddd;
     border-radius: 5px;
 }
-
+.icon-large {
+    font-size: x-large;
+}
 .formulaire form button {
     display: block;
     width: 100%;
